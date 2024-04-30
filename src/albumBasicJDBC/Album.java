@@ -11,16 +11,16 @@ public class Album {
 
     private int idAlbum;
     private String titol;
-    private int idArtista;
+    private Artista artista;
     private static Connection con = Connexio.getConnection();
 
     public Album(){
         super();
     }
-    public Album(int idAlbum, String titol, int idArtista) {
+    public Album(int idAlbum, String titol, Artista artista) {
         this.idAlbum = idAlbum;
         this.titol = titol;
-        this.idArtista = idArtista;
+        this.artista = artista;
     }
 
     public int getIdAlbum() {
@@ -39,12 +39,12 @@ public class Album {
         this.titol = titol;
     }
 
-    public int getIdArtista() {
-        return idArtista;
+    public Artista getIdArtista() {
+        return artista;
     }
 
-    public void setIdArtista(int idArtista) {
-        this.idArtista = idArtista;
+    public void setArtista(Artista artista) {
+        this.artista = artista;
     }
 
     @Override
@@ -52,7 +52,7 @@ public class Album {
         return "\nAlbum: " +
                 "id=" + idAlbum +
                 ", nom='" + titol + '\'' +
-                ", artista id=" + idArtista;
+                ", artista" + artista;
     }
 
     public int creaAlbum(String titol, int idArtista) {
@@ -66,7 +66,7 @@ public class Album {
                 //Modifiquem i executem la PreparedStatement
                 ps.setString(1, titol);
                 ps.setInt(2, idArtista);
-                if (Artista.verificarArtista(idArtista)) {
+                if (Artista.buscaArtista(idArtista) == null) {
                     System.out.println("No es troba artista amb ID " + idArtista);
                     String nomArtista = "Prova Artista";
                     Artista.creaArtista(new Artista(idArtista, nomArtista));
@@ -101,7 +101,8 @@ public class Album {
                 int albumId = rs.getInt("AlbumId");
                 String  title = rs.getString("Title");
                 int artistId = rs.getInt("ArtistId");
-                album = new Album(albumId, title, artistId);
+                Artista artista = Artista.buscaArtista(artistId);
+                album = new Album(albumId, title, artista);
             }
             rs.close();
             ps.close();
@@ -162,7 +163,8 @@ public class Album {
                 int albumId = rs.getInt("AlbumId");
                 String  title = rs.getString("Title");
                 int  artistId = rs.getInt("ArtistId");
-                albums.add(new Album(albumId, title, artistId));
+                Artista artista = Artista.buscaArtista(artistId);
+                albums.add(new Album(albumId, title, artista));
             }
             rs.close();
             stmt.close();

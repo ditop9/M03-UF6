@@ -14,8 +14,19 @@ public class Artista {
         return id;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getNom() {
         return nom;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
+    public Artista() {
     }
 
     public Artista(int idArtista, String nom) {
@@ -23,7 +34,7 @@ public class Artista {
         this.nom = nom;
     }
     public static void creaArtista(Artista artista) {
-        if (verificarArtista(artista.getId())) {
+        if (buscaArtista(artista.getId()) == null) {
             String query = "INSERT INTO Artist (ArtistId, Name) VALUES (?, ?)";
             try (PreparedStatement ps = con.prepareStatement(query)) {
                 con.setAutoCommit(false);
@@ -40,16 +51,18 @@ public class Artista {
             System.out.println("Error: ja existeix un artista amb aquest ID");
         }
     }
-    public static boolean verificarArtista(int idArtista) {
+    public static Artista buscaArtista(int idArtista) {
         String query = "SELECT * FROM Artist WHERE ArtistId=?";
         try (PreparedStatement ps = con.prepareStatement(query);) {
             con.setAutoCommit(false);
             ps.setInt(1, idArtista);
             ResultSet rs = ps.executeQuery();
-            return !rs.next();
+            if (rs.next()) {
+                return new Artista(rs.getInt(1), rs.getString(2));
+            } else return null;
         } catch (SQLException e) {
             System.err.println(e.getClass().getName());
-            return true;
+            return null;
         }
     }
 
